@@ -1,0 +1,36 @@
+{
+  "_comment": "Static administrative-code lookup bundled with the demo dataset. Codes follow the LGD (Local Government Directory) shape used by ULPIN but the values here are DEMO values, not authoritative LGD codes. Regions are matched by bounding box in order; the first match wins, otherwise `default` is used.",
+  "regions": [
+    {
+      "name": "Bengaluru Urban - Bengaluru North Taluk",
+      "bbox": [77.4600, 12.9600, 77.6800, 13.1400],
+      "state_code": "29",
+      "district_code": "05",
+      "tehsil_code": "102",
+      "village_code": "214"
+    },
+    {
+      "name": "Bengaluru Urban - Bengaluru South Taluk",
+      "bbox": [77.4600, 12.8000, 77.6800, 12.9600],
+      "state_code": "29",
+      "district_code": "05",
+      "tehsil_code": "103",
+      "village_code": "271"
+    },
+    {
+      "name": "Bengaluru Urban - Anekal Taluk",
+      "bbox": [77.6000, 12.6500, 77.8500, 12.9000],
+      "state_code": "29",
+      "district_code": "05",
+      "tehsil_code": "104",
+      "village_code": "318"
+    }
+  ],
+  "default": {
+    "name": "Unmapped demo region",
+    "state_code": "29",
+    "district_code": "05",
+    "tehsil_code": "999",
+    "village_code": "999"
+  }
+}

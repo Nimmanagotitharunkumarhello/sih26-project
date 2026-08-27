@@ -1,0 +1,1093 @@
+/* Vertical Property Registry — a survey sheet that happens to be interactive.
+   One warm neutral family, one accent. Depth comes from layered surfaces,
+   inset highlights and warm-tinted diffusion rather than grey 1px boxes. */
+
+:root {
+  --paper-0: #faf8f4;
+  --paper-1: #f1eee7;
+  --paper-2: #e7e2d8;
+  --paper-3: #dcd6c9;
+
+  --ink-1: #241f19;
+  --ink-2: #5a5248;
+  --ink-3: #8f8778;
+
+  --accent: #9c3d2e;
+  --accent-tint: rgba(156, 61, 46, 0.09);
+
+  /* The drafting-table ground. Must match INK.field in theme.js: Cesium's own
+     widget stylesheet defaults to black and shows through unless overpainted. */
+  --field: #e3ddce;
+
+  /* Hairlines are tinted ink, never grey. */
+  --hair: rgba(42, 38, 32, 0.09);
+  --hair-strong: rgba(42, 38, 32, 0.16);
+
+  /* Warm-tinted diffusion. On light ground the inset highlight is what sells
+     the material — it reads as an edge catching light. */
+  --lift: inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  --shadow-1: 0 1px 2px rgba(42, 38, 32, 0.05), 0 8px 20px -12px rgba(42, 38, 32, 0.14);
+  --shadow-2: 0 1px 2px rgba(42, 38, 32, 0.06), 0 20px 40px -20px rgba(42, 38, 32, 0.22);
+
+  --sans: 'Satoshi', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --mono: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', Consolas, monospace;
+
+  --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --gutter: 20px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background: var(--paper-1);
+  color: var(--ink-1);
+  font-family: var(--sans);
+  font-size: 14px;
+  font-feature-settings: 'ss01', 'cv01';
+  -webkit-font-smoothing: antialiased;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 3px;
+}
+
+.app {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--paper-1);
+}
+
+/* --- hatches ----------------------------------------------------------
+   How a drawing tells materials apart. Used for unit uses, so the palette
+   never has to spend a second hue on them. */
+
+.hatch {
+  display: block;
+  border: 1px solid var(--hair-strong);
+  border-radius: 2px;
+  background-color: var(--paper-0);
+}
+
+.hatch-solid {
+  background-color: var(--accent);
+  border-color: var(--accent);
+}
+
+.hatch-diagonal {
+  background-image: repeating-linear-gradient(
+    45deg,
+    var(--ink-1) 0 1px,
+    transparent 1px 3.5px
+  );
+}
+
+.hatch-cross {
+  background-image: repeating-linear-gradient(45deg, var(--ink-2) 0 1px, transparent 1px 4px),
+    repeating-linear-gradient(-45deg, var(--ink-2) 0 1px, transparent 1px 4px);
+}
+
+.hatch-dot {
+  background-image: radial-gradient(var(--ink-2) 0.6px, transparent 0.7px);
+  background-size: 3.5px 3.5px;
+}
+
+/* --- title block ------------------------------------------------------ */
+
+.title-block {
+  display: flex;
+  align-items: stretch;
+  justify-content: space-between;
+  background: var(--paper-0);
+  box-shadow: var(--lift), 0 1px 0 var(--hair), 0 6px 20px -18px rgba(42, 38, 32, 0.5);
+  position: relative;
+  z-index: 2;
+  flex-shrink: 0;
+}
+
+.title-block-mark {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  padding: 13px var(--gutter);
+}
+
+.registry-glyph {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 9px;
+  background: var(--ink-1);
+  color: var(--paper-0);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14), 0 4px 10px -4px rgba(42, 38, 32, 0.5);
+}
+
+.title-block h1 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: -0.022em;
+  line-height: 1.1;
+}
+
+.title-block-sub {
+  margin: 3px 0 0;
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.title-block-cells {
+  display: flex;
+  align-items: stretch;
+}
+
+.tb-cell {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 3px;
+  min-width: 96px;
+  padding: 10px 16px;
+  border-left: 1px solid var(--hair);
+}
+
+.tb-cell-label {
+  font-family: var(--mono);
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.tb-cell-value {
+  font-family: var(--mono);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+
+.tb-cell-value.is-live {
+  color: var(--accent);
+}
+
+.tb-controls {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 0 var(--gutter) 0 16px;
+  border-left: 1px solid var(--hair);
+}
+
+/* Nested control: a tray holding the segments, so the active one reads as a
+   machined insert rather than a coloured rectangle. */
+.view-toggle {
+  display: flex;
+  gap: 2px;
+  padding: 3px;
+  border-radius: 9px;
+  background: var(--paper-2);
+  box-shadow: inset 0 1px 2px rgba(42, 38, 32, 0.09);
+}
+
+.view-toggle button {
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+  transition: color 0.4s var(--ease), background 0.4s var(--ease);
+}
+
+.view-toggle button:hover:not(:disabled):not(.is-active) {
+  color: var(--ink-1);
+  background: rgba(255, 255, 255, 0.6);
+}
+
+.view-toggle button.is-active {
+  background: var(--paper-0);
+  color: var(--ink-1);
+  box-shadow: var(--lift), 0 1px 2px rgba(42, 38, 32, 0.14);
+}
+
+.view-toggle button:disabled {
+  color: var(--ink-3);
+  cursor: not-allowed;
+}
+
+.assembly-toggle {
+  padding: 8px 15px;
+  border-radius: 8px;
+  background: var(--paper-0);
+  color: var(--accent);
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  box-shadow: var(--lift), 0 0 0 1px var(--hair), var(--shadow-1);
+  transition: transform 0.4s var(--ease), box-shadow 0.4s var(--ease);
+}
+
+.assembly-toggle:hover {
+  box-shadow: var(--lift), 0 0 0 1px rgba(156, 61, 46, 0.3), var(--shadow-2);
+}
+
+.assembly-toggle:active {
+  transform: scale(0.975);
+}
+
+/* --- sheet layout ------------------------------------------------------ */
+
+.sheet {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr 396px;
+  min-height: 0;
+}
+
+/* The drawing field: a drafting-table ground, deliberately several steps
+   deeper than the record panel. Ink linework needs something to sit against —
+   on near-white it washes out entirely. The Cesium canvas is transparent, so
+   this gradient shows through it. */
+.drawing {
+  position: relative;
+  min-height: 0;
+  background: radial-gradient(
+    118% 88% at 50% 40%,
+    #ece7db 0%,
+    #e3ddce 52%,
+    #d5cdba 100%
+  );
+}
+
+/* Paper tooth. Painted by ::before so it sits *under* the drawing layers —
+   as ::after it veiled the linework it was meant to sit behind. */
+.drawing::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.4;
+  background-image: radial-gradient(rgba(42, 38, 32, 0.22) 0.5px, transparent 0.6px);
+  background-size: 3px 3px;
+}
+
+.drawing-layer {
+  position: absolute;
+  inset: 0;
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity 0.5s var(--ease);
+}
+
+.drawing-layer.is-visible {
+  visibility: visible;
+  opacity: 1;
+}
+
+.map-canvas {
+  width: 100%;
+  height: 100%;
+}
+
+.cesium-canvas .cesium-viewer-bottom {
+  display: none;
+}
+
+.cesium-canvas .cesium-widget,
+.cesium-canvas .cesium-widget canvas {
+  background: var(--field);
+}
+
+/* Vignette over the drawing field. Fully transparent through the middle, so it
+   deepens the periphery without veiling the linework. */
+.drawing-vignette {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  background: radial-gradient(
+    108% 82% at 50% 42%,
+    rgba(36, 31, 25, 0) 45%,
+    rgba(36, 31, 25, 0.07) 78%,
+    rgba(36, 31, 25, 0.16) 100%
+  );
+}
+
+.drawing-furniture {
+  position: absolute;
+  left: var(--gutter);
+  bottom: var(--gutter);
+  display: flex;
+  align-items: flex-end;
+  gap: 18px;
+  pointer-events: none;
+  color: var(--ink-3);
+  z-index: 1;
+}
+
+.north-arrow {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  font-family: var(--mono);
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+}
+
+.north-arrow svg {
+  transition: transform 0.7s var(--ease);
+}
+
+.projection-note {
+  margin: 0 0 2px;
+  font-family: var(--mono);
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+}
+
+.drawing-note,
+.drawing-busy {
+  position: absolute;
+  left: 50%;
+  padding: 9px 17px;
+  border-radius: 999px;
+  background: var(--paper-0);
+  box-shadow: var(--lift), 0 0 0 1px var(--hair), var(--shadow-2);
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  pointer-events: none;
+  z-index: 1;
+  animation: rise 0.6s var(--ease) both;
+}
+
+.drawing-note {
+  bottom: var(--gutter);
+  transform: translateX(-50%);
+  color: var(--ink-2);
+}
+
+.drawing-note.is-warning {
+  color: var(--accent);
+  box-shadow: var(--lift), 0 0 0 1px rgba(156, 61, 46, 0.28), var(--shadow-2);
+}
+
+.drawing-busy {
+  top: var(--gutter);
+  transform: translateX(-50%);
+  color: var(--accent);
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 8px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+/* --- record margin ----------------------------------------------------- */
+
+.record {
+  overflow-y: auto;
+  background: var(--paper-0);
+  box-shadow: -1px 0 0 var(--hair), -18px 0 40px -30px rgba(42, 38, 32, 0.5);
+  position: relative;
+  z-index: 1;
+}
+
+.record-block {
+  padding: 18px var(--gutter);
+  border-bottom: 1px solid var(--hair);
+}
+
+.record-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  margin: 0 0 13px;
+  font-family: var(--mono);
+  font-size: 9.5px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.record-heading-count {
+  letter-spacing: 0.06em;
+  color: var(--ink-2);
+}
+
+.notice {
+  display: flex;
+  gap: 11px;
+  padding: 13px var(--gutter);
+  background: var(--accent-tint);
+  border-bottom: 1px solid var(--hair);
+  font-size: 11.5px;
+  line-height: 1.55;
+  color: var(--ink-2);
+}
+
+.notice-stamp {
+  flex-shrink: 0;
+  align-self: flex-start;
+  padding: 3px 7px;
+  border-radius: 4px;
+  background: var(--accent);
+  color: var(--paper-0);
+  font-family: var(--mono);
+  font-size: 8.5px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.empty-record {
+  padding: 38px var(--gutter);
+}
+
+.empty-record h2 {
+  margin: 0 0 9px;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.028em;
+}
+
+.empty-record p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.65;
+  color: var(--ink-2);
+  max-width: 46ch;
+}
+
+.empty-steps {
+  margin: 20px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.empty-steps li {
+  display: flex;
+  gap: 12px;
+  padding: 11px 0;
+  border-top: 1px solid var(--hair);
+  font-size: 12.5px;
+  color: var(--ink-2);
+  animation: step-in 0.7s var(--ease) both;
+  animation-delay: calc(var(--i) * 90ms);
+}
+
+.empty-steps b {
+  flex-shrink: 0;
+  width: 20px;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  font-weight: 500;
+  color: var(--accent);
+}
+
+@keyframes step-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* --- parcel heading ---------------------------------------------------- */
+
+.parcel-name {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.12;
+}
+
+.parcel-address {
+  margin: 5px 0 0;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--ink-3);
+}
+
+/* --- SIGNATURE: the dimensioned ULPIN ---------------------------------
+   Mounted on its own plate: the identifier is the one thing on this sheet
+   that earns elevation. */
+
+.ulpin-dim {
+  margin-top: 17px;
+  padding: 13px 14px 11px;
+  border-radius: 10px;
+  background: var(--paper-0);
+  box-shadow: var(--lift), 0 0 0 1px var(--hair), var(--shadow-1);
+}
+
+.ulpin-dim-caption {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 9px;
+  font-family: var(--mono);
+  font-size: 8.5px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.ulpin-copy {
+  font-family: var(--mono);
+  font-size: 8.5px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+  transition: opacity 0.4s var(--ease);
+}
+
+.ulpin-copy:hover {
+  opacity: 0.65;
+}
+
+.ulpin-grid {
+  display: grid;
+  gap: 0 6px;
+}
+
+.ulpin-digits {
+  font-family: var(--mono);
+  font-size: 22px;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  text-align: center;
+  color: var(--ink-1);
+}
+
+.ulpin-bracket {
+  position: relative;
+  height: 7px;
+  margin-top: 6px;
+  border-top: 1px solid var(--ink-3);
+}
+
+.ulpin-bracket::before,
+.ulpin-bracket::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  width: 1px;
+  height: 5px;
+  background: var(--ink-3);
+}
+
+.ulpin-bracket::before {
+  left: 0;
+}
+
+.ulpin-bracket::after {
+  right: 0;
+}
+
+.ulpin-seg-label {
+  margin-top: 5px;
+  font-family: var(--mono);
+  font-size: 8px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-align: center;
+  color: var(--ink-3);
+}
+
+/* --- measurements ------------------------------------------------------
+   No boxes: data grouped by rule and space, per dense-UI practice. */
+
+.measure-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  column-gap: 16px;
+  margin: 18px 0 0;
+}
+
+.measure-grid > div {
+  padding: 11px 0;
+  border-top: 1px solid var(--hair);
+}
+
+.measure-grid dt {
+  font-family: var(--mono);
+  font-size: 8.5px;
+  font-weight: 500;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.measure-grid dd {
+  margin: 4px 0 0;
+  font-family: var(--mono);
+  font-size: 16px;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+}
+
+.measure-unit {
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--ink-3);
+}
+
+.measure-text {
+  font-family: var(--sans);
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  text-transform: capitalize;
+}
+
+/* --- level index ------------------------------------------------------- */
+
+.level-index {
+  display: flex;
+  flex-direction: column-reverse;
+}
+
+.level-row {
+  display: grid;
+  grid-template-columns: 44px 1fr auto;
+  align-items: center;
+  gap: 11px;
+  padding: 7px 9px 7px 7px;
+  border-radius: 6px;
+  text-align: left;
+  transition: background 0.4s var(--ease), transform 0.4s var(--ease);
+}
+
+.level-row:hover {
+  background: var(--paper-2);
+}
+
+.level-row:active {
+  transform: scale(0.99);
+}
+
+.level-row.is-selected {
+  background: var(--ink-1);
+  color: var(--paper-0);
+  box-shadow: 0 4px 14px -8px rgba(42, 38, 32, 0.9);
+}
+
+.level-row-tag {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-align: right;
+}
+
+.level-row-rail {
+  position: relative;
+  height: 2px;
+  border-radius: 1px;
+  background: var(--paper-3);
+}
+
+.level-row.is-selected .level-row-rail {
+  background: rgba(250, 248, 244, 0.22);
+}
+
+.level-row-rail i {
+  position: absolute;
+  inset: 0 auto 0 0;
+  border-radius: 1px;
+  background: var(--ink-3);
+  transition: width 0.6s var(--ease);
+}
+
+.level-row.is-selected .level-row-rail i {
+  background: var(--accent);
+}
+
+.level-row-units {
+  font-family: var(--mono);
+  font-size: 9.5px;
+  color: var(--ink-3);
+}
+
+.level-row.is-selected .level-row-units {
+  color: rgba(250, 248, 244, 0.65);
+}
+
+/* --- unit schedule ----------------------------------------------------- */
+
+.unit-row {
+  display: grid;
+  grid-template-columns: 12px 1fr auto auto;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 10px 9px 10px 7px;
+  border-radius: 7px;
+  border-top: 1px solid var(--hair);
+  text-align: left;
+  transition: background 0.4s var(--ease), transform 0.4s var(--ease);
+}
+
+.unit-row:hover {
+  background: var(--paper-2);
+}
+
+.unit-row:active {
+  transform: scale(0.99);
+}
+
+.unit-row.is-selected {
+  background: var(--accent-tint);
+  box-shadow: inset 0 0 0 1px rgba(156, 61, 46, 0.22);
+}
+
+.unit-row .hatch {
+  width: 12px;
+  height: 12px;
+}
+
+.unit-id {
+  font-family: var(--mono);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+
+.unit-use {
+  display: block;
+  margin-top: 2px;
+  font-size: 10.5px;
+  color: var(--ink-3);
+}
+
+.unit-area {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--ink-2);
+}
+
+.unit-encumbered {
+  padding: 2px 6px;
+  border-radius: 3px;
+  background: var(--accent);
+  color: var(--paper-0);
+  font-family: var(--mono);
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 15px;
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--hair);
+  font-family: var(--mono);
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.legend span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.legend .hatch {
+  width: 10px;
+  height: 10px;
+}
+
+/* --- unit record ------------------------------------------------------- */
+
+.unit-record-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.unit-record-head h3 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.028em;
+}
+
+.unit-record-use {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-family: var(--mono);
+  font-size: 9.5px;
+  font-weight: 500;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+}
+
+.unit-record-use .hatch {
+  width: 10px;
+  height: 10px;
+}
+
+.extension-stack {
+  margin: 15px 0 0;
+  padding: 14px 15px;
+  border-radius: 10px;
+  background: var(--ink-1);
+  color: var(--paper-0);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1), var(--shadow-2);
+}
+
+.extension-base {
+  font-family: var(--mono);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: rgba(250, 248, 244, 0.7);
+}
+
+.extension-rows {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.extension-rows li {
+  display: grid;
+  grid-template-columns: 15px 66px 1fr;
+  align-items: center;
+  gap: 9px;
+  padding-top: 7px;
+  font-family: var(--mono);
+  font-size: 11.5px;
+  color: rgba(250, 248, 244, 0.55);
+  animation: step-in 0.6s var(--ease) both;
+  animation-delay: calc(var(--i) * 70ms);
+}
+
+.extension-branch {
+  color: rgba(250, 248, 244, 0.3);
+}
+
+.extension-code {
+  color: #e8a08e;
+  font-weight: 500;
+}
+
+.record-list {
+  display: grid;
+  margin: 16px 0 0;
+}
+
+.record-list > div {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 0;
+  border-top: 1px solid var(--hair);
+}
+
+.record-list dt {
+  font-family: var(--mono);
+  font-size: 8.5px;
+  font-weight: 500;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.record-list dd {
+  margin: 0;
+  font-size: 13.5px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  text-align: right;
+}
+
+.record-list dd.mono {
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 400;
+}
+
+.encumbrance {
+  margin: 16px 0 0;
+  padding: 11px 13px;
+  border-radius: 8px;
+  background: var(--paper-1);
+  font-size: 12px;
+  line-height: 1.55;
+  color: var(--ink-2);
+}
+
+.encumbrance.is-flagged {
+  background: var(--accent-tint);
+  color: var(--ink-1);
+}
+
+.encumbrance b {
+  color: var(--accent);
+}
+
+/* --- transaction history ---------------------------------------------- */
+
+.history {
+  margin: 4px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.history li {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 4px 12px;
+  padding: 12px 0;
+  border-top: 1px solid var(--hair);
+}
+
+.history-type {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-family: var(--mono);
+  font-size: 9.5px;
+  font-weight: 500;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+}
+
+/* The event kind is a mark, not a colour: a filled square for a transfer of
+   title, a hollow one for a charge against it. */
+.history-type::before {
+  content: '';
+  width: 7px;
+  height: 7px;
+  border-radius: 1px;
+  border: 1px solid var(--accent);
+}
+
+.history-sale::before,
+.history-inheritance::before {
+  background: var(--accent);
+}
+
+.history-date {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--ink-3);
+  text-align: right;
+}
+
+.history-parties {
+  grid-column: 1 / -1;
+  font-size: 12.5px;
+  line-height: 1.5;
+}
+
+.history-amount {
+  grid-column: 1 / -1;
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--ink-2);
+}
+
+/* --- responsive -------------------------------------------------------- */
+
+@media (max-width: 940px) {
+  .sheet {
+    grid-template-columns: 1fr;
+    grid-template-rows: minmax(280px, 46%) 1fr;
+  }
+
+  .record {
+    box-shadow: 0 -1px 0 var(--hair);
+  }
+
+  .title-block {
+    flex-wrap: wrap;
+  }
+
+  .tb-cell {
+    display: none;
+  }
+
+  .tb-controls {
+    flex: 1;
+    justify-content: flex-end;
+    border-left: none;
+    padding-bottom: 12px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
