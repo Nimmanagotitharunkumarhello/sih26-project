@@ -34,13 +34,6 @@ export const UNIT_TYPE_LABELS = Object.fromEntries(
   Object.entries(UNIT_TYPES).map(([key, value]) => [key, value.label]),
 );
 
-/** The trailing type code carried inside every 3D ULPIN. */
-export const UNIT_TYPE_CODES = {
-  residential: 1,
-  commercial: 2,
-  parking: 3,
-  common: 4,
-};
 
 export function unitHatch(unitType) {
   return UNIT_TYPES[unitType]?.hatch ?? 'hatch-solid';
@@ -70,13 +63,12 @@ export function floorLabel(floorNumber) {
   return floorNumber === 0 ? 'Ground' : `Level ${floorNumber}`;
 }
 
-/** The 14-digit base ULPIN, split into the segments a dimension line annotates. */
+/** The 14-character base ULPIN, split into the segments a dimension line annotates. */
 export const ULPIN_SEGMENTS = [
   { key: 'state', label: 'State', digits: 2 },
   { key: 'district', label: 'District', digits: 2 },
-  { key: 'tehsil', label: 'Tehsil', digits: 3 },
-  { key: 'village', label: 'Village', digits: 3 },
-  { key: 'plot', label: 'Plot', digits: 4 },
+  { key: 'area', label: 'Area', digits: 2 },
+  { key: 'building', label: 'Building', digits: 8 },
 ];
 
 export function splitUlpin(ulpin2d) {

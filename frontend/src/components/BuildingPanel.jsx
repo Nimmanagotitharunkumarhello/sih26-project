@@ -24,7 +24,7 @@ function DimensionedUlpin({ ulpin2d }) {
   return (
     <div className="ulpin-dim">
       <div className="ulpin-dim-caption">
-        <span>Parcel identifier · 14 digit</span>
+        <span>Parcel identifier · 14 character</span>
         <button type="button" className="ulpin-copy" onClick={copy}>
           {copied ? 'Copied' : 'Copy'}
         </button>

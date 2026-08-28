@@ -9,11 +9,10 @@ it into floor volumes and units, and issues a 3D ULPIN for every unit, each with
 its own ownership record and transaction history.
 
 ```
-29051022140529-F04-U0402-T1
-└── base ULPIN ─┘ │    │     └── unit type (1 residential, 2 commercial,
-   (14 digits)    │    │                     3 parking, 4 common)
-                  │    └── unit number (flat 402)
-                  └── floor 04
+KA0501A3F9K2P70402
+└─ base ULPIN ─┘││└── room 02 (1-based, within the floor)
+   (14 chars)    │└─── floor 04
+                 └──── (unit type is a separate DB/API field, not ID-encoded)
 ```
 
 > **Simulated data.** Real ULPINs are issued by state revenue departments from
@@ -113,16 +112,19 @@ The two starred modules are the substance; everything else is plumbing.
 
 ### ULPIN generation
 
-The 14-digit base matches the existing ULPIN width:
-`[state:2][district:2][tehsil:3][village:3][plot:4]`. Administrative codes come
-from a static bundled table (`data/admin_regions.json`) rather than a live
-geocoder. The plot code is a blake2b hash of the centroid rounded to 6 decimals —
-blake2b rather than Python's `hash()`, which is salted per process and would
-renumber every parcel on restart.
+The 14-character base is `[state:2 alpha][district:2][area:2][building:8]`.
+Administrative codes come from a static bundled table (`data/admin_regions.json`)
+rather than a live geocoder. The building code is a blake2b hash of the centroid
+rounded to 6 decimals, base-encoded over an 8-character, 34-symbol alphabet
+(digits plus A-Z minus the easily-misread I/O) — blake2b rather than Python's
+`hash()`, which is salted per process and would renumber every parcel on
+restart. That's a ~1.8×10¹² value space, wide enough that two distinct
+buildings colliding is effectively impossible.
 
-The unit segment is **4 digits** so it can carry the conventional flat number
-(flat 1201 is on floor 12). Three digits overflow above the ninth floor, and the
-demo dataset contains 29-storey towers.
+Floor and room are each **2 digits** (00-99). Room is a simple 1-based index
+within its floor, not a conventional flat number — floor is already its own
+segment, so there's no need to double-encode it. Unit type (residential,
+commercial, parking, common) is a plain DB/API field, not part of the ID.
 
 ### Floor and unit segmentation
 

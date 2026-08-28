@@ -103,7 +103,7 @@ def test_validation_distinguishes_malformed_from_unregistered(demo_building):
     assert registered["valid"] is True and registered["registered"] is True
     assert registered["parsed"]["kind"] == "3d"
 
-    well_formed_but_unknown = client.get("/api/validate/99999999999999-F01-U0101-T1").json()
+    well_formed_but_unknown = client.get("/api/validate/KA0599ZZ99ZZ990101").json()
     assert well_formed_but_unknown["valid"] is True
     assert well_formed_but_unknown["registered"] is False
 

@@ -1,5 +1,4 @@
 import {
-  UNIT_TYPE_CODES,
   UNIT_TYPE_LABELS,
   formatDate,
   formatInr,
@@ -18,9 +17,8 @@ const HISTORY_LABELS = {
 function ExtensionStack({ unit }) {
   const base = unit.parent_ulpin_2d;
   const rows = [
-    { code: `F${String(unit.floor_number).padStart(2, '0')}`, label: unit.floor_number === 0 ? 'Ground level' : `Level ${unit.floor_number}` },
-    { code: `U${String(unit.unit_number).padStart(4, '0')}`, label: `Unit ${unit.unit_number}` },
-    { code: `T${UNIT_TYPE_CODES[unit.unit_type] ?? '?'}`, label: UNIT_TYPE_LABELS[unit.unit_type] ?? unit.unit_type },
+    { code: `${String(unit.floor_number).padStart(2, '0')}`, label: unit.floor_number === 0 ? 'Ground level' : `Level ${unit.floor_number}` },
+    { code: `${String(unit.unit_number).padStart(2, '0')}`, label: `Room ${unit.unit_number}` },
   ];
 
   return (
@@ -43,7 +41,7 @@ export default function OwnershipCard({ unit }) {
   return (
     <section className="record-block">
       <div className="unit-record-head">
-        <h3>Unit {unit.unit_number}</h3>
+        <h3>Room {unit.unit_number}</h3>
         <span className="unit-record-use">
           <i className={`hatch ${unitHatch(unit.unit_type)}`} />
           {UNIT_TYPE_LABELS[unit.unit_type] ?? unit.unit_type}

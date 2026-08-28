@@ -130,7 +130,6 @@ def test_every_unit_carries_a_parseable_3d_ulpin_for_its_own_floor():
             parsed = parse_ulpin(unit["ulpin_3d"])
             assert parsed["ulpin_2d"] == ULPIN_2D
             assert parsed["floor_number"] == floor["floor_number"]
-            assert parsed["unit_type"] == unit["unit_type"]
             assert unit["ulpin_3d"].startswith(floor["ulpin_3d_prefix"])
             seen.add(unit["ulpin_3d"])
 
