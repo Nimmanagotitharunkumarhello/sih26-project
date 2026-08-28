@@ -647,6 +647,82 @@ button {
   color: var(--ink-3);
 }
 
+/* Six brackets instead of four: the full 18-character identifier needs tighter
+   type and gaps to keep every segment's name under its own bracket. */
+.ulpin-dim.is-compact .ulpin-grid {
+  gap: 0 4px;
+}
+
+.ulpin-dim.is-compact .ulpin-digits {
+  font-size: 18px;
+}
+
+.ulpin-dim.is-compact .ulpin-seg-label {
+  font-size: 7.5px;
+  letter-spacing: 0.06em;
+}
+
+/* The vertical extension — the segments this project adds to the scheme — is
+   drawn in the accent so it reads apart from the parcel code it extends. */
+.ulpin-digits.is-extension {
+  color: var(--accent);
+}
+
+.ulpin-bracket.is-extension {
+  border-top-color: var(--accent);
+}
+
+.ulpin-bracket.is-extension::before,
+.ulpin-bracket.is-extension::after {
+  background: var(--accent);
+}
+
+.ulpin-seg-label.is-extension {
+  color: var(--accent);
+}
+
+/* `issued` — the identifier as it is handed over for one room, inked onto the
+   dark card the record uses for the thing it has actually issued. */
+.ulpin-dim.is-issued {
+  margin-top: 15px;
+  background: var(--ink-1);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1), var(--shadow-2);
+}
+
+.ulpin-dim.is-issued .ulpin-dim-caption,
+.ulpin-dim.is-issued .ulpin-seg-label {
+  color: rgba(250, 248, 244, 0.45);
+}
+
+.ulpin-dim.is-issued .ulpin-digits {
+  color: var(--paper-0);
+}
+
+.ulpin-dim.is-issued .ulpin-bracket {
+  border-top-color: rgba(250, 248, 244, 0.32);
+}
+
+.ulpin-dim.is-issued .ulpin-bracket::before,
+.ulpin-dim.is-issued .ulpin-bracket::after {
+  background: rgba(250, 248, 244, 0.32);
+}
+
+.ulpin-dim.is-issued .ulpin-copy,
+.ulpin-dim.is-issued .ulpin-digits.is-extension,
+.ulpin-dim.is-issued .ulpin-seg-label.is-extension {
+  /* The lac red goes muddy on the dark ground; this is the same hue lifted. */
+  color: #e8a08e;
+}
+
+.ulpin-dim.is-issued .ulpin-bracket.is-extension {
+  border-top-color: #e8a08e;
+}
+
+.ulpin-dim.is-issued .ulpin-bracket.is-extension::before,
+.ulpin-dim.is-issued .ulpin-bracket.is-extension::after {
+  background: #e8a08e;
+}
+
 /* --- measurements ------------------------------------------------------
    No boxes: data grouped by rule and space, per dense-UI practice. */
 
@@ -888,51 +964,6 @@ button {
 .unit-record-use .hatch {
   width: 10px;
   height: 10px;
-}
-
-.extension-stack {
-  margin: 15px 0 0;
-  padding: 14px 15px;
-  border-radius: 10px;
-  background: var(--ink-1);
-  color: var(--paper-0);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1), var(--shadow-2);
-}
-
-.extension-base {
-  font-family: var(--mono);
-  font-size: 13px;
-  font-weight: 500;
-  letter-spacing: -0.01em;
-  color: rgba(250, 248, 244, 0.7);
-}
-
-.extension-rows {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.extension-rows li {
-  display: grid;
-  grid-template-columns: 15px 66px 1fr;
-  align-items: center;
-  gap: 9px;
-  padding-top: 7px;
-  font-family: var(--mono);
-  font-size: 11.5px;
-  color: rgba(250, 248, 244, 0.55);
-  animation: step-in 0.6s var(--ease) both;
-  animation-delay: calc(var(--i) * 70ms);
-}
-
-.extension-branch {
-  color: rgba(250, 248, 244, 0.3);
-}
-
-.extension-code {
-  color: #e8a08e;
-  font-weight: 500;
 }
 
 .record-list {

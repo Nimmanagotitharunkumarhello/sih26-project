@@ -238,9 +238,10 @@ export default function App() {
             <div className="empty-record">
               <h2>No parcel selected</h2>
               <p>
-                Every building on the plan carries a 14-digit parcel identifier.
-                Selecting one slices it into levels and issues a further
-                identifier for each unit inside.
+                Every building on the plan carries a 14-character parcel
+                identifier. Selecting one slices it into levels and extends that
+                code with a floor and room, issuing a full 18-character
+                identifier for each room inside.
               </p>
               <ol className="empty-steps">
                 {[
