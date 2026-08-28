@@ -34,13 +34,6 @@ export const UNIT_TYPE_LABELS = Object.fromEntries(
   Object.entries(UNIT_TYPES).map(([key, value]) => [key, value.label]),
 );
 
-/** The trailing type code carried inside every 3D ULPIN. */
-export const UNIT_TYPE_CODES = {
-  residential: 1,
-  commercial: 2,
-  parking: 3,
-  common: 4,
-};
 
 export function unitHatch(unitType) {
   return UNIT_TYPES[unitType]?.hatch ?? 'hatch-solid';
@@ -70,19 +63,33 @@ export function floorLabel(floorNumber) {
   return floorNumber === 0 ? 'Ground' : `Level ${floorNumber}`;
 }
 
-/** The 14-digit base ULPIN, split into the segments a dimension line annotates. */
-export const ULPIN_SEGMENTS = [
-  { key: 'state', label: 'State', digits: 2 },
-  { key: 'district', label: 'District', digits: 2 },
-  { key: 'tehsil', label: 'Tehsil', digits: 3 },
-  { key: 'village', label: 'Village', digits: 3 },
-  { key: 'plot', label: 'Plot', digits: 4 },
+/** The segments a dimension line annotates. `short` is used on the full
+ *  18-character identifier, where six brackets share the panel width and the
+ *  full names would collide. */
+export const ULPIN_BASE_SEGMENTS = [
+  { key: 'state', label: 'State', short: 'State', digits: 2 },
+  { key: 'district', label: 'District', short: 'Dist', digits: 2 },
+  { key: 'area', label: 'Area', short: 'Area', digits: 2 },
+  { key: 'building', label: 'Building', short: 'Building', digits: 8 },
 ];
 
-export function splitUlpin(ulpin2d) {
+/** The vertical extension — the part this project contributes to the scheme. */
+export const ULPIN_UNIT_SEGMENTS = [
+  { key: 'floor', label: 'Floor', short: 'Floor', digits: 2, extension: true },
+  { key: 'room', label: 'Room', short: 'Room', digits: 2, extension: true },
+];
+
+export const ULPIN_SEGMENTS = [...ULPIN_BASE_SEGMENTS, ...ULPIN_UNIT_SEGMENTS];
+
+export const ULPIN_BASE_LENGTH = ULPIN_BASE_SEGMENTS.reduce((n, s) => n + s.digits, 0);
+
+/** Split a 14-character building ULPIN or a full 18-character room ULPIN into
+ *  its annotated segments. The width decides which table applies. */
+export function splitUlpin(ulpin) {
+  const table = ulpin.length > ULPIN_BASE_LENGTH ? ULPIN_SEGMENTS : ULPIN_BASE_SEGMENTS;
   let offset = 0;
-  return ULPIN_SEGMENTS.map((segment) => {
-    const value = ulpin2d.slice(offset, offset + segment.digits);
+  return table.map((segment) => {
+    const value = ulpin.slice(offset, offset + segment.digits);
     offset += segment.digits;
     return { ...segment, value };
   });

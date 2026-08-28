@@ -197,7 +197,7 @@ def segment_building(
     unit polygons with their 3D ULPINs.
     """
     # Imported here to keep this module usable standalone in geometry tests.
-    from services.ulpin_generator import floor_prefix, generate_ulpin_3d, unit_number_for
+    from services.ulpin_generator import floor_prefix, generate_ulpin_3d, room_number_for
 
     geom = shape(footprint)
     if not isinstance(geom, Polygon):
@@ -220,10 +220,10 @@ def segment_building(
         units = []
         for index, unit_m in enumerate(unit_shapes_m):
             unit_type = _unit_type(building_type, floor_number, index)
-            unit_number = unit_number_for(floor_number, index)
+            unit_number = room_number_for(index)
             units.append(
                 {
-                    "ulpin_3d": generate_ulpin_3d(ulpin_2d, floor_number, unit_number, unit_type),
+                    "ulpin_3d": generate_ulpin_3d(ulpin_2d, floor_number, unit_number),
                     "unit_number": unit_number,
                     "unit_type": unit_type,
                     "area_sqft": round(unit_m.area * SQM_TO_SQFT, 1),

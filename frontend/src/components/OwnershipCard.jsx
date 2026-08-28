@@ -1,10 +1,10 @@
 import {
-  UNIT_TYPE_CODES,
   UNIT_TYPE_LABELS,
   formatDate,
   formatInr,
   unitHatch,
 } from '../theme';
+import UlpinDimension from './UlpinDimension';
 
 const HISTORY_LABELS = {
   sale: 'Sale',
@@ -12,45 +12,23 @@ const HISTORY_LABELS = {
   inheritance: 'Inheritance',
 };
 
-/** The vertical extension drawn as a dimension stack: the base parcel, then
- *  each segment branching downward — the identifier descending through the
- *  building the same way the building descends through its levels. */
-function ExtensionStack({ unit }) {
-  const base = unit.parent_ulpin_2d;
-  const rows = [
-    { code: `F${String(unit.floor_number).padStart(2, '0')}`, label: unit.floor_number === 0 ? 'Ground level' : `Level ${unit.floor_number}` },
-    { code: `U${String(unit.unit_number).padStart(4, '0')}`, label: `Unit ${unit.unit_number}` },
-    { code: `T${UNIT_TYPE_CODES[unit.unit_type] ?? '?'}`, label: UNIT_TYPE_LABELS[unit.unit_type] ?? unit.unit_type },
-  ];
-
-  return (
-    <div className="extension-stack">
-      <div className="extension-base">{base}</div>
-      <ul className="extension-rows">
-        {rows.map((row, index) => (
-          <li key={row.code} style={{ '--i': index }}>
-            <span className="extension-branch">{index === rows.length - 1 ? '└─' : '├─'}</span>
-            <span className="extension-code">{row.code}</span>
-            <span>{row.label}</span>
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
-}
-
 export default function OwnershipCard({ unit }) {
   return (
     <section className="record-block">
       <div className="unit-record-head">
-        <h3>Unit {unit.unit_number}</h3>
+        <h3>
+          {unit.floor_number === 0 ? 'Ground' : `Level ${unit.floor_number}`} · Room{' '}
+          {unit.unit_number}
+        </h3>
         <span className="unit-record-use">
           <i className={`hatch ${unitHatch(unit.unit_type)}`} />
           {UNIT_TYPE_LABELS[unit.unit_type] ?? unit.unit_type}
         </span>
       </div>
 
-      <ExtensionStack unit={unit} />
+      {/* The whole identifier, floor and room included — the base parcel code
+          plus the vertical extension, annotated as one dimension string. */}
+      <UlpinDimension ulpin={unit.ulpin_3d} caption="Room identifier" variant="issued" />
 
       <dl className="record-list">
         <div>

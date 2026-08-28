@@ -4,33 +4,29 @@
     {
       "name": "Bengaluru Urban - Bengaluru North Taluk",
       "bbox": [77.4600, 12.9600, 77.6800, 13.1400],
-      "state_code": "29",
+      "alpha_state_code": "KA",
       "district_code": "05",
-      "tehsil_code": "102",
-      "village_code": "214"
+      "area_code": "01"
     },
     {
       "name": "Bengaluru Urban - Bengaluru South Taluk",
       "bbox": [77.4600, 12.8000, 77.6800, 12.9600],
-      "state_code": "29",
+      "alpha_state_code": "KA",
       "district_code": "05",
-      "tehsil_code": "103",
-      "village_code": "271"
+      "area_code": "02"
     },
     {
       "name": "Bengaluru Urban - Anekal Taluk",
       "bbox": [77.6000, 12.6500, 77.8500, 12.9000],
-      "state_code": "29",
+      "alpha_state_code": "KA",
       "district_code": "05",
-      "tehsil_code": "104",
-      "village_code": "318"
+      "area_code": "03"
     }
   ],
   "default": {
     "name": "Unmapped demo region",
-    "state_code": "29",
+    "alpha_state_code": "KA",
     "district_code": "05",
-    "tehsil_code": "999",
-    "village_code": "999"
+    "area_code": "99"
   }
 }
